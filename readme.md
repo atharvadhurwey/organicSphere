@@ -1,6 +1,6 @@
 # Organic Sphere
 
-- [GitHub](https://github.com/brunosimon/organic-sphere)
+- [GitHub](https://github.com/atharvadhurwey/organicSphere)
 - Live 🚧
 
 ## Setup
