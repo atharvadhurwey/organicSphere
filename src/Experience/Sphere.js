@@ -32,12 +32,16 @@ export default class Sphere {
 
   setGeometry() {
     this.geometry = new THREE.SphereBufferGeometry(1, 512, 512)
+    this.geometry.computeTangents()
   }
 
   setMaterial() {
     this.material = new THREE.ShaderMaterial({
       vertexShader,
       fragmentShader,
+      defines: {
+        USE_TANGENT: "",
+      },
       uniforms: {
         uDistortionFrequency: { value: 2.0 },
         uDistortionStrength: { value: 1.0 },
