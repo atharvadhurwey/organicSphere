@@ -1,7 +1,7 @@
 # Organic Sphere
 
 - [GitHub](https://github.com/atharvadhurwey/organicSphere)
-- Live 🚧
+- [Live](https://organic-sphere-threejs.vercel.app/)
 
 ## Setup
 Download [Node.js](https://nodejs.org/en/download/).
