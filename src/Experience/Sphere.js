@@ -1,7 +1,7 @@
 import * as THREE from "three"
 import vertexShader from "./shaders/sphere/vertex.glsl"
 import fragmentShader from "./shaders/sphere/fragment.glsl"
-import Experience from "./Experience"
+import Experience from "./Experience.js"
 
 export default class Sphere {
   constructor() {
@@ -50,6 +50,9 @@ export default class Sphere {
 
       return Math.max(level0, level1, level2) * 0.3
     }
+    this.variations.volume.getDefault = () => {
+      return 0.152
+    }
 
     this.variations.lowLevel = {}
     this.variations.lowLevel.target = 0
@@ -63,6 +66,9 @@ export default class Sphere {
       value = Math.max(0, value)
 
       return value
+    }
+    this.variations.lowLevel.getDefault = () => {
+      return 0.0003
     }
 
     this.variations.mediumLevel = {}
@@ -78,6 +84,9 @@ export default class Sphere {
 
       return value
     }
+    this.variations.mediumLevel.getDefault = () => {
+      return 3.587
+    }
 
     this.variations.highLevel = {}
     this.variations.highLevel.target = 0
@@ -91,6 +100,9 @@ export default class Sphere {
       value = Math.max(0.5, value)
 
       return value
+    }
+    this.variations.highLevel.getDefault = () => {
+      return 0.65
     }
   }
 
@@ -304,7 +316,7 @@ export default class Sphere {
     // Update variations
     for (let _variationName in this.variations) {
       const variation = this.variations[_variationName]
-      variation.target = variation.getValue()
+      variation.target = this.microphone.ready ? variation.getValue() : variation.getDefault()
 
       const easing = variation.target > variation.current ? variation.upEasing : variation.downEasing
       variation.current += (variation.target - variation.current) * easing * this.time.delta
