@@ -9,6 +9,7 @@ export default class Sphere {
     this.scene = this.experience.scene
     this.debug = this.experience.debug
     this.time = this.experience.time
+    this.microphone = this.experience.microphone
 
     this.timeFrequency = 0.0003
 
@@ -25,11 +26,25 @@ export default class Sphere {
       })
     }
 
+    this.setVariations()
     this.setGeometry()
     this.setLights()
     this.setOffset()
     this.setMaterial()
     this.setMesh()
+  }
+
+  setVariations() {
+    this.variations = {}
+
+    this.variations.volume = {}
+    this.variations.volume.target = 0
+    this.variations.volume.current = 0
+    this.variations.volume.upEasing = 0.03
+    this.variations.volume.downEasing = 0.002
+    this.variations.volume.getValue = () => {
+      return this.microphone.volume
+    }
   }
 
   setLights() {
@@ -246,6 +261,14 @@ export default class Sphere {
   }
 
   update() {
+    // Microphone
+    this.variations.volume.target = this.variations.volume.getValue()
+    const easing = this.variations.volume.target > this.variations.volume.current ? this.variations.volume.upEasing : this.variations.volume.downEasing
+    this.variations.volume.current += (this.variations.volume.target - this.variations.volume.current) * easing * this.time.delta
+
+    this.material.uniforms.uDisplacementStrength.value = this.variations.volume.current
+
+    // Offset
     const offsetTime = this.time.elapsed * 0.3
     this.offset.spherical.phi =
       (Math.sin(offsetTime * 0.001) * Math.sin(offsetTime * 0.00321) * 0.5 + 0.5) * Math.PI
@@ -255,6 +278,8 @@ export default class Sphere {
     this.offset.direction.multiplyScalar(0.01)
 
     this.material.uniforms.uOffset.value.add(this.offset.direction)
+
+    // Time
     this.material.uniforms.uTime.value += this.time.delta * this.timeFrequency
   }
 }
