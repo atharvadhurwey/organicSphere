@@ -9,6 +9,8 @@ uniform float uLightBIntensity;
 
 uniform vec2 uSubdivision;
 
+uniform vec3 uOffset;
+
 uniform float uDistortionFrequency; 
 uniform float uDistortionStrength; 
 uniform float uDisplacementFrequency; 
@@ -27,22 +29,23 @@ varying vec3 vColor;
 #pragma glslify: perlin4d = require('../partials/perlin4d.glsl')
 #pragma glslify: perlin3d = require('../partials/perlin3d.glsl')
 
-vec4 getDisplacedPosition(vec3 _position) {
-  vec3 displacementPosition = _position;
-  displacementPosition += perlin4d(vec4(displacementPosition * uDistortionFrequency, uTime)) * uDistortionStrength;
+vec3 getDisplacedPosition(vec3 _position) {
 
-  float perlinStrength = perlin4d(vec4(displacementPosition * uDisplacementFrequency, uTime));
+  vec3 distoredPosition = _position;
+  distoredPosition += perlin4d(vec4(distoredPosition * uDistortionFrequency + uOffset, uTime)) * uDistortionStrength;
+
+  float perlinStrength = perlin4d(vec4(distoredPosition * uDisplacementFrequency + uOffset, uTime));
  
   vec3 displacedPosition = _position;
   displacedPosition += normalize(_position) * perlinStrength * uDisplacementStrength;
-  return vec4(displacedPosition, perlinStrength);
+  return displacedPosition;
 }
 
 void main() { 
   // Position
-  vec4 displacedPosition = getDisplacedPosition(position);
+  vec3 displacedPosition = getDisplacedPosition(position);
 
-  vec4 viewPosition = viewMatrix * vec4(displacedPosition.xyz, 1.0);
+  vec4 viewPosition = viewMatrix * vec4(displacedPosition, 1.0);
   gl_Position = projectionMatrix * viewPosition;
 
   // BiTangent
@@ -52,10 +55,10 @@ void main() {
   vec3 biTangent = cross(normal, tangent.xyz);
 
   vec3 positionA = position + tangent.xyz * distanceA;
-  vec3 displacedPositionA = getDisplacedPosition(positionA).xyz;
+  vec3 displacedPositionA = getDisplacedPosition(positionA);
 
   vec3 positionB = position + biTangent.xyz * distanceB;
-  vec3 displacedPositionB = getDisplacedPosition(positionB).xyz;
+  vec3 displacedPositionB = getDisplacedPosition(positionB);
 
   vec3 computerNormal = cross(displacedPositionA - displacedPosition.xyz, displacedPositionB - displacedPosition.xyz);
   computerNormal = normalize(computerNormal);
@@ -74,9 +77,6 @@ void main() {
   color = mix(color, uLightBColor, lightBIntensity * fresnel);
   color = mix(color, vec3(1.0), clamp(pow(max(0.0, fresnel - 0.8), 3.0), 0.0, 1.0));
 
-
   // Varying
-  vNormal = normal;
-  vPerlinStrength = displacedPosition.a;
   vColor = color;
 }
