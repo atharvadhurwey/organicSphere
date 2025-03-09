@@ -73,19 +73,12 @@ export default class Renderer {
     this.postProcess.renderPass = new RenderPass(this.scene, this.camera.instance)
 
     // Bloom pass
-    this.postProcess.unrealBloomPass = new UnrealBloomPass(
-      new THREE.Vector2(this.sizes.width, this.sizes.height),
-      0.8,
-      0.315,
-      0
-    )
+    this.postProcess.unrealBloomPass = new UnrealBloomPass(new THREE.Vector2(this.sizes.width, this.sizes.height), 0.8, 0.315, 0)
     this.postProcess.unrealBloomPass.enabled = true
 
     this.postProcess.unrealBloomPass.tintColor = {}
     this.postProcess.unrealBloomPass.tintColor.value = "#7f00ff"
-    this.postProcess.unrealBloomPass.tintColor.instance = new THREE.Color(
-      this.postProcess.unrealBloomPass.tintColor.value
-    )
+    this.postProcess.unrealBloomPass.tintColor.instance = new THREE.Color(this.postProcess.unrealBloomPass.tintColor.value)
 
     this.postProcess.unrealBloomPass.compositeMaterial.uniforms.uTintColor = {
       value: this.postProcess.unrealBloomPass.tintColor.instance,
@@ -154,28 +147,21 @@ void main() {
           label: "uTintColor",
         })
         .on("change", () => {
-          this.postProcess.unrealBloomPass.tintColor.instance.set(
-            this.postProcess.unrealBloomPass.tintColor.value
-          )
+          this.postProcess.unrealBloomPass.tintColor.instance.set(this.postProcess.unrealBloomPass.tintColor.value)
         })
 
-      debugFolder.addInput(
-        this.postProcess.unrealBloomPass.compositeMaterial.uniforms.uTintStrength,
-        "value",
-        {
-          label: "uTintStrength",
-          min: 0,
-          max: 1,
-          step: 0.001,
-        }
-      )
+      debugFolder.addInput(this.postProcess.unrealBloomPass.compositeMaterial.uniforms.uTintStrength, "value", {
+        label: "uTintStrength",
+        min: 0,
+        max: 1,
+        step: 0.001,
+      })
     }
 
     /**
      * Effect composer
      */
-    const RenderTargetClass =
-      this.config.pixelRatio >= 2 ? THREE.WebGLRenderTarget : THREE.WebGLMultisampleRenderTarget
+    const RenderTargetClass = this.config.pixelRatio >= 2 ? THREE.WebGLRenderTarget : THREE.WebGLMultisampleRenderTarget
     // const RenderTargetClass = THREE.WebGLRenderTarget
     this.renderTarget = new RenderTargetClass(this.config.width, this.config.height, {
       generateMipmaps: false,
